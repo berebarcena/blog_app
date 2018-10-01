@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+}
+
+input {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ff28b9;
+  width: 100%;
+  display: inline-block;
+}
+
+form {
+  width: 400px;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+body {
+  margin: 0 auto;
+  margin-top: 100px;
+  max-width: 50vw;
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  line-height: 1.6;
+  color: #555555;
+}
+
+a {
+  text-decoration: none;
+  color: #ff28b9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
+
+.black {
+  color: #000;
+  font-size: 16px;
+}
+
+.msg_wrapper {
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+button {
+  background: #ff28b9;
+  padding: 8px;
+  border: none;
+  width: 80px;
+  border-radius: 3px;
+  color: black;
+  font-size: 16px;
+  font-family: 'Oswald', sans-serif;
+  margin-top: 2em;
+}
+
+.radio {
+  display: flex;
+  justify-content: space-between;
+}
+
+.radio div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.radio div input {
+  width: 30px;
+}
