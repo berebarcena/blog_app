@@ -17,9 +17,9 @@ const sequelize = new Sequelize({
   username: process.env.POSTGRES_USER,
   host: 'localhost',
   dialect: 'postgres',
-  // define: {
-  //   timestamps: false, // true by default
-  // },
+  define: {
+    timestamps: false, // true by default
+  },
 });
 
 app.use(
@@ -44,7 +44,7 @@ const User = sequelize.define('users', {
 });
 
 app.get('/', (req, res) => {
-  res.render('login');
+  res.render('login', { message: req.query.message });
 });
 
 //post request
@@ -71,6 +71,18 @@ app.post('/login', (req, res) => {
 //render the profile
 app.get('/profile', (req, res) => {
   res.render('profile', { userInfo: req.session.user });
+});
+
+//logout route
+app.get('/logout', (req, res) => {
+  req.session.destroy(error => {
+    if (error) {
+      throw error;
+    }
+    res.redirect(
+      '/?message=' + encodeURIComponent("You've been successfully logged out.")
+    );
+  });
 });
 
 sequelize.sync({ force: true }).then(function() {
