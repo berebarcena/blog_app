@@ -79,9 +79,7 @@ app.get('/logout', (req, res) => {
     if (error) {
       throw error;
     }
-    res.redirect(
-      '/?message=' + encodeURIComponent("You've been successfully logged out.")
-    );
+    res.redirect('/?message=' + encodeURIComponent('You are logged out.'));
   });
 });
 

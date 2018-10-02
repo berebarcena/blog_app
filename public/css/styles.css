@@ -5,7 +5,7 @@
 input {
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ff28b9;
+  border: 1px solid #0828CC;
   width: 100%;
   display: inline-block;
 }
@@ -22,7 +22,7 @@ body {
   margin: 0 auto;
   margin-top: 100px;
   max-width: 50vw;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'PT Sans', sans-serif;
   font-size: 15px;
 }
 
@@ -36,7 +36,7 @@ p {
 
 a {
   text-decoration: none;
-  color: #ff28b9;
+  color: #0828CC;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 13px;
@@ -53,28 +53,13 @@ a {
 }
 
 button {
-  background: #ff28b9;
+  background: #0828CC;
   padding: 8px;
   border: none;
   width: 80px;
   border-radius: 3px;
-  color: black;
+  color: white;
   font-size: 16px;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'PT Sans', sans-serif;
   margin-top: 2em;
-}
-
-.radio {
-  display: flex;
-  justify-content: space-between;
-}
-
-.radio div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.radio div input {
-  width: 30px;
 }
