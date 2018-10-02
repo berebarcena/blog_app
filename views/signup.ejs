@@ -7,20 +7,21 @@
 </head>
 
 <body>
-  <h3>
-    <%= message %>
-  </h3>
-  <h1>Login </h1>
-  <p>Enter your details below</p>
-  <form method="POST" action="/login">
 
+  <h1>Sign up </h1>
+  <p>Enter your details below, all fields are required .</p>
+  <form method="POST" action="/signup">
+    <input type="text" placeholder="Your name" name="name" autocomplete="off">
     <input type="text" placeholder="Your email" name="email" autocomplete="off">
     <input type="text" placeholder="Your password" name="password" autocomplete="off">
-    <button type="submit" class="nice">Login</button>
+    <h3 class="red">
+      <%= error %>
+    </h3>
+    <button type="submit" class="nice">Sign me up!</button>
   </form>
   <div class="actions">
-    <p>Don't have an account?</p>
-    <a href="/signup">Sign up instead</a>
+    <p>Already have an account?</p>
+    <a href="/">Log in!</a>
   </div>
 
 </body>

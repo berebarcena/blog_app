@@ -12,6 +12,7 @@ input {
 
 form {
   width: 400px;
+  margin: 10px 0;
 }
 
 textarea {
@@ -56,10 +57,18 @@ button {
   background: #0828CC;
   padding: 8px;
   border: none;
-  width: 80px;
+  width: 120px;
   border-radius: 3px;
   color: white;
   font-size: 16px;
   font-family: 'PT Sans', sans-serif;
-  margin-top: 2em;
+  margin-top: 10px;
+}
+
+.actions {
+  margin-top: 15px;
+}
+
+.red {
+  color: red;
 }

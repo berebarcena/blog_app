@@ -34,40 +34,83 @@ app.use(
 const User = sequelize.define('users', {
   name: {
     type: Sequelize.STRING,
+    unique: true,
+    allowNull: false,
   },
   email: {
     type: Sequelize.STRING,
+    unique: true,
+    allowNull: false,
   },
   password: {
     type: Sequelize.STRING,
+    unique: true,
+    allowNull: false,
   },
 });
 
 app.get('/', (req, res) => {
   res.render('login', { message: req.query.message });
 });
-
-//post request
+app.get('/signup', (req, res) => {
+  const error = req.query.error;
+  const errorMsg =
+    error === 'no-empty-fields' ? 'Sorry! but all the fields are required' : '';
+  res.render('signup', { error: errorMsg });
+});
+//post request login
 app.post('/login', (req, res) => {
-  const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
-
-  //populating the user table with the inputs from the form
-  User.create({
-    name: name,
-    email: email,
-    password: password,
+  if (!email) {
+    res.redirect(
+      '/?message=' + encodeURIComponent('Please fill out your email address.')
+    );
+  }
+  if (!password) {
+    res.redirect(
+      '/?message=' + encodeURIComponent('Please fill out your password.')
+    );
+  }
+  User.findOne({
+    where: {
+      email: email,
+    },
   })
     .then(user => {
-      req.session.user = user;
-      res.redirect('/profile');
+      if (user && password === user.password) {
+        req.session.user = user;
+        res.redirect('/profile');
+      } else {
+        res.redirect(
+          '/?message=' + encodeURIComponent('Invalid email or password.')
+        );
+      }
     })
-    .catch(err => {
-      console.log(err);
+    .catch(function(error) {
+      console.error(error);
     });
 });
 
+//post request signup
+app.post('/signup', (req, res) => {
+  if (!req.body.name || !req.body.email || !req.body.password) {
+    res.redirect('/signup?error=no-empty-fields');
+  } else {
+    User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    })
+      .then(user => {
+        req.session.user = user;
+        res.redirect('/profile');
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+});
 //render the profile
 app.get('/profile', (req, res) => {
   res.render('profile', { userInfo: req.session.user });
@@ -83,8 +126,11 @@ app.get('/logout', (req, res) => {
   });
 });
 
-sequelize.sync({ force: true }).then(function() {
-  var server = app.listen(3000, function() {
-    console.log('App listening on port: ' + server.address().port);
-  });
-});
+sequelize
+  .sync()
+  .then(() => {
+    const server = app.listen(3000, () => {
+      console.log('App listening on port: ' + server.address().port);
+    });
+  })
+  .catch(error => console.log('This error occured', error));
