@@ -8,25 +8,15 @@
 </head>
 
 <body>
-  <nav>
-    <ul>
-
-      <li><a href="/logout">logout</a></li>
-    </ul>
-  </nav>
-
-  <h2>Welcome
-    <%= userInfo.name %> to your profile</h2>
-
-  <h2>Here are all your posts</h2>
-  <% posts.forEach(p => { %>
+  <h2>Here are all the blog posts</h2>
+  <% postData.forEach(p => { %>
   <div>
     <%= p.title%>
     <%= p.body %>
     <%= p.createdAt %>
+    <%= p.user.name %>
   </div>
   <% }) %>
-
 
 
 
