@@ -11,18 +11,31 @@
 
   <% if (!post ) { %>
   <h1>No post with that Id</h1>
-
   <% } else { %>
   <h1>
     <%= post.title%>
   </h1>
-  <%= post.body %>
-  <%= post.createdAt %>
-  <p>Written by <a href="/blog/<%=post.user.username%>">
-      <%= post.user.username %></a></p>
-
+  <div>Published on
+    <%= post.createdAt %>
+  </div>
+  <div>
+    <%= post.body %>
+  </div>
+  <div>Written by <a href="/blog/<%=post.user.username%>">
+      <%= post.user.username %></a>
+  </div>
+  <% if (user ) { %>
   <h2>Leave a comment</h2>
+  <form method="POST" action="/new-comment" id="commentForm">
+
+    <textarea type="text" placeholder="Your nice comment here" name="comment" form="commentForm" autocomplete="off"></textarea>
+    <input type="hidden" name="postId" value="<%= post.id %>" />
+    <input type="hidden" name="postAuthor" value="<%= post.user.username %>" />
+    <button type="submit" class="nice">Post comment</button>
+  </form>
   <% } %>
+  <% } %>
+
 </body>
 
 </html>

@@ -84,6 +84,7 @@ User.hasMany(Post);
 Post.belongsTo(User);
 Post.hasMany(Comment);
 Comment.belongsTo(Post);
+User.hasMany(Comment);
 
 //login is the home
 app.get('/', (req, res) => {
@@ -192,7 +193,6 @@ app.post('/create-post', (req, res) => {
 });
 
 //get all blogposts from all users
-
 app.get('/blog', (req, res) => {
   const user = req.session.user;
   Post.findAll({
@@ -219,26 +219,10 @@ app.get('/blog/:username', (req, res) => {
       },
     ],
   }).then(posts => {
-    let postTitle = '';
-    let postBody = '';
-    let postDate = '';
-    let postAuthor = '';
-    // console.log(posts);
-
-    posts.forEach(p => {
-      postTitle = p.title;
-      postBody = p.body;
-      postDate = p.createdAt;
-      postAuthor = p.user.username;
-    });
-
     res.render('blog', {
       userInfo: user,
       posts,
-      postTitle,
-      postBody,
-      postDate,
-      postAuthor,
+      postAuthor: username,
     });
   });
 });
@@ -248,19 +232,65 @@ app.get('/blog/:username/:postId', (req, res) => {
   const postId = req.params.postId;
   const username = req.params.username;
 
-  Post.findOne({
+  Comment.findAll({
     where: {
-      id: postId,
+      postId: postId,
     },
-    include: [
-      {
-        model: User,
-        where: { username: username },
-      },
-    ],
-  }).then(post => {
-    res.render('blog_post', { post });
-  });
+  })
+    .then(comments => {
+      if (comments.length) {
+        return Post.findOne({
+          where: {
+            id: postId,
+          },
+          include: [
+            {
+              model: User,
+              where: { username: username },
+            },
+            {
+              model: Comment,
+            },
+          ],
+        });
+      } else {
+        return Post.findOne({
+          where: {
+            id: postId,
+          },
+          include: [
+            {
+              model: User,
+              where: { username: username },
+            },
+          ],
+        });
+      }
+    })
+    .then(post => {
+      console.log(post);
+      res.render('blog_post', { post, user });
+    });
+});
+
+//new comment for post
+app.post('/new-comment', (req, res) => {
+  const comment = req.body.comment;
+  const userId = req.session.user.id;
+  const postId = req.body.postId;
+  const postAuthor = req.body.postAuthor;
+
+  return Comment.create({
+    comment,
+    postId,
+    userId,
+  })
+    .then(comment => {
+      res.redirect(`/blog/${postAuthor}/${postId}`);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
 
 //logout route

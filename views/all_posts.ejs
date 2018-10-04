@@ -14,8 +14,11 @@
 
     <div>
       <%= p.title%>
-      <%= p.createdAt %>
-      <%= p.user.name %>
+    </div>
+    <div>Written by
+      <%= p.user.username %>
+      <span>On
+        <%= p.createdAt %></span>
     </div>
   </a>
   <% }) %>
