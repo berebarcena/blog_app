@@ -10,12 +10,14 @@
 <body>
   <h2>Here are all the blog posts</h2>
   <% postData.forEach(p => { %>
-  <div>
-    <%= p.title%>
-    <%= p.body %>
-    <%= p.createdAt %>
-    <%= p.user.name %>
-  </div>
+  <a href="/blog/<%=p.user.username%>/<%=p.id%>">
+
+    <div>
+      <%= p.title%>
+      <%= p.createdAt %>
+      <%= p.user.name %>
+    </div>
+  </a>
   <% }) %>
 
 

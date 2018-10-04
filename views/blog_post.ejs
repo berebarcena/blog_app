@@ -18,7 +18,9 @@
   </h1>
   <%= post.body %>
   <%= post.createdAt %>
-  <%= post.user.name %>
+  <p>Written by <a href="/blog/<%=post.user.username%>">
+      <%= post.user.username %></a></p>
+
   <h2>Leave a comment</h2>
   <% } %>
 </body>

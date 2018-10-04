@@ -125,7 +125,7 @@ app.post('/login', (req, res) => {
         console.log(
           `this is the user from the login =========${user.username}`
         );
-        res.redirect(`/blog/${user.username}/`);
+        res.redirect(`/blog/${user.username}`);
       } else {
         //if the password or email is incorrect, send a message
         res.redirect(
@@ -154,7 +154,7 @@ app.post('/signup', (req, res) => {
         //console.log(`this is the user from the signup =========${user}`);
         req.session.user = user;
         console.log();
-        res.redirect(`/blog/${user.username}/`);
+        res.redirect(`/blog/${user.username}`);
       })
       .catch(err => {
         console.log(err);
@@ -207,7 +207,7 @@ app.get('/blog', (req, res) => {
 });
 
 //render the blog from specific user
-app.get('/blog/:username/', (req, res) => {
+app.get('/blog/:username', (req, res) => {
   const user = req.session.user;
   const username = req.params.username;
 
@@ -223,7 +223,7 @@ app.get('/blog/:username/', (req, res) => {
     let postBody = '';
     let postDate = '';
     let postAuthor = '';
-    console.log(posts);
+    // console.log(posts);
 
     posts.forEach(p => {
       postTitle = p.title;
