@@ -8,47 +8,33 @@
 </head>
 
 <body>
-  <%  if (!posts.length ) { %>
+
+  <%  if (userInfo.username) { %>
   <nav>
     <ul>
       <li><a href="/logout">logout</a></li>
       <li><a href="/blog">See all posts</a></li>
     </ul>
   </nav>
+  <% } else { %>
+
+  <li><a href="/blog">See all posts</a></li>
+  <% }  %>
+  <% if (userInfo && userInfo.username === postAuthor ) { %>
   <h1>Welcome
     <%= userInfo.username %> to your Blog</h1>
-  <p>you have no posts yet </p>
-  <a href='/create-post'>Create your first post</a>
-
-  <% } else if (userInfo.username === postAuthor ) { %>
-  <nav>
-    <ul>
-      <li><a href="/logout">logout</a></li>
-      <li><a href="/blog">See all posts</a></li>
-    </ul>
-  </nav>
-  <h1>Welcome
-    <%= postAuthor %> to your Blog</h1>
-  <h2>Here are all your posts</h2>
-  <% posts.forEach(post =>{ %>
-  <a href="/blog/<%= postAuthor %>/<%= post.id %>">
-    <div>
-      <%= post.title%>
-      <%= post.createdAt %>
-    </div>
-  </a>
-  <% }) %>
-  <a href='/create-post'>Create another post</a>
   <% } else { %>
-  <nav>
-    <ul>
-      <li><a href="/blog">See all posts</a></li>
-    </ul>
-  </nav>
-  <h1>Welcome
-    to
+  <h1>Welcome to
     <%= postAuthor %>'s Blog</h1>
-
+  <% } %>
+  <%  if (!posts.length ){ %>
+  <%  if (userInfo.username) { %>
+  <p>You have no posts yet </p>
+  <a href='/create-post'>Create your first post</a>
+  <%  } else { %>
+  <p>No posts yet</p>
+  <% } %>
+  <%  } else { %>
   <h2>Here are the posts</h2>
   <% posts.forEach(post =>{ %>
   <a href="/blog/<%= postAuthor %>/<%= post.id %>">
@@ -58,7 +44,10 @@
     </div>
   </a>
   <% }) %>
+  <%  if (userInfo.username) { %>
+  <a href='/create-post'>Create a new post</a>
   <% } %>
+  <% }  %>
 </body>
 
 </html>

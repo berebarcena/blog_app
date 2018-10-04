@@ -24,6 +24,16 @@
   <div>Written by <a href="/blog/<%=post.user.username%>">
       <%= post.user.username %></a>
   </div>
+  <% if (post.comments && post.comments.length ) { %>
+  <h3>Comments for this post</h3>
+  <% post.comments.forEach(c =>{ %>
+  <p>
+    <%= c.comment %>
+  </p>
+  <% }) %>
+  <% } else { %>
+  <p>No comments for this post yet :(</p>
+  <% } %>
   <% if (user ) { %>
   <h2>Leave a comment</h2>
   <form method="POST" action="/new-comment" id="commentForm">

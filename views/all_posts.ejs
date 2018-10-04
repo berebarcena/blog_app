@@ -8,6 +8,13 @@
 </head>
 
 <body>
+  <%  if (user.username) { %>
+  <nav>
+    <ul>
+      <li><a href="/logout">logout</a></li>
+    </ul>
+  </nav>
+  <% } %>
   <h2>Here are all the blog posts</h2>
   <% postData.forEach(p => { %>
   <a href="/blog/<%=p.user.username%>/<%=p.id%>">

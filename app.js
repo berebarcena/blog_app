@@ -26,8 +26,8 @@ app.use(
   session({
     store: new SequelizeStore({
       db: sequelize,
-      checkExpirationInterval: 15 * 60 * 1000, // The interval at which to cleanup expired sessions in milliseconds.
-      expiration: 24 * 60 * 60 * 1000, // The maximum age (in milliseconds) of a valid session.
+      checkExpirationInterval: 15 * 60 * 1000,
+      expiration: 24 * 60 * 60 * 1000,
     }),
     secret: 'dunno',
     saveUninitialized: true,
@@ -70,7 +70,7 @@ const Post = sequelize.define('posts', {
   updatedAt: Sequelize.DATEONLY,
 });
 
-//defining the user model
+//defining the comment model
 const Comment = sequelize.define('comments', {
   comment: {
     type: Sequelize.TEXT,
@@ -86,9 +86,13 @@ Post.hasMany(Comment);
 Comment.belongsTo(Post);
 User.hasMany(Comment);
 
-//login is the home
+//login is the home (if logged out)
 app.get('/', (req, res) => {
-  res.render('login', { message: req.query.message });
+  if (req.session.user) {
+    res.redirect(`/blog/${req.session.user.username}`);
+  } else {
+    res.render('login', { message: req.query.message });
+  }
 });
 
 //signup route
@@ -123,9 +127,6 @@ app.post('/login', (req, res) => {
     .then(user => {
       if (user && password === user.password) {
         req.session.user = user;
-        console.log(
-          `this is the user from the login =========${user.username}`
-        );
         res.redirect(`/blog/${user.username}`);
       } else {
         //if the password or email is incorrect, send a message
@@ -152,9 +153,7 @@ app.post('/signup', (req, res) => {
       password: req.body.password,
     })
       .then(user => {
-        //console.log(`this is the user from the signup =========${user}`);
         req.session.user = user;
-        console.log();
         res.redirect(`/blog/${user.username}`);
       })
       .catch(err => {
@@ -163,10 +162,12 @@ app.post('/signup', (req, res) => {
   }
 });
 
+//render the create post form
 app.get('/create-post', (req, res) => {
   res.render('create_post');
 });
 
+//create a new blog post
 app.post('/create-post', (req, res) => {
   const username = req.session.user.username;
   const title = req.body.title;
@@ -178,13 +179,13 @@ app.post('/create-post', (req, res) => {
     },
   })
     .then(user => {
+      //populate post table
       return user.createPost({
         title: title,
         body: postBody,
       });
     })
     .then(post => {
-      console.log(post);
       res.redirect(`/blog/${username}/${post.id}`);
     })
     .catch(err => {
@@ -202,7 +203,7 @@ app.get('/blog', (req, res) => {
       },
     ],
   }).then(post => {
-    res.render('all_posts', { postData: post, user });
+    res.render('all_posts', { postData: post, user: user || {} });
   });
 });
 
@@ -220,24 +221,26 @@ app.get('/blog/:username', (req, res) => {
     ],
   }).then(posts => {
     res.render('blog', {
-      userInfo: user,
+      userInfo: user || {},
       posts,
       postAuthor: username,
     });
   });
 });
 
+//render specific post
 app.get('/blog/:username/:postId', (req, res) => {
   const user = req.session.user;
   const postId = req.params.postId;
   const username = req.params.username;
-
+  //fist check if there are any comments
   Comment.findAll({
     where: {
       postId: postId,
     },
   })
     .then(comments => {
+      //if the comments exist then find the post including the model table
       if (comments.length) {
         return Post.findOne({
           where: {
@@ -254,6 +257,7 @@ app.get('/blog/:username/:postId', (req, res) => {
           ],
         });
       } else {
+        //if there are no comments, then only find the post with that id and user
         return Post.findOne({
           where: {
             id: postId,
@@ -268,7 +272,6 @@ app.get('/blog/:username/:postId', (req, res) => {
       }
     })
     .then(post => {
-      console.log(post);
       res.render('blog_post', { post, user });
     });
 });
@@ -277,6 +280,7 @@ app.get('/blog/:username/:postId', (req, res) => {
 app.post('/new-comment', (req, res) => {
   const comment = req.body.comment;
   const userId = req.session.user.id;
+  //hidden inputs to create the redirect path
   const postId = req.body.postId;
   const postAuthor = req.body.postAuthor;
 
