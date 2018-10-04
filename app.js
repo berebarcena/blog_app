@@ -5,9 +5,14 @@ const session = require('express-session');
 const Sequelize = require('sequelize');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
+//get the css files
+app.use(express.static('public'));
+
+//set ejs
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
 //db config
 const sequelize = new Sequelize({
   database: process.env.BLOGAPP,
@@ -30,14 +35,11 @@ app.use(
   })
 );
 
-//get the css files
-app.use(express.static('public'));
-
 //defining the User model
 const User = sequelize.define(
   'users',
   {
-    name: {
+    username: {
       type: Sequelize.STRING,
       unique: true,
     },
@@ -56,6 +58,7 @@ const User = sequelize.define(
   }
 );
 
+//defining the post model
 const Post = sequelize.define('posts', {
   title: {
     type: Sequelize.STRING,
@@ -67,6 +70,7 @@ const Post = sequelize.define('posts', {
   updatedAt: Sequelize.DATEONLY,
 });
 
+//defining the user model
 const Comment = sequelize.define('comments', {
   comment: {
     type: Sequelize.TEXT,
@@ -74,7 +78,8 @@ const Comment = sequelize.define('comments', {
   createdAt: Sequelize.DATEONLY,
   updatedAt: Sequelize.DATEONLY,
 });
-//defining the relationships
+
+//defining the relationships between the models
 User.hasMany(Post);
 Post.belongsTo(User);
 Post.hasMany(Comment);
@@ -117,8 +122,9 @@ app.post('/login', (req, res) => {
     .then(user => {
       if (user && password === user.password) {
         req.session.user = user;
-        res.redirect('/profile');
+        res.redirect(`/blog/${user.username}`);
       } else {
+        //if the password or email is incorrect, send a message
         res.redirect(
           '/?message=' + encodeURIComponent('Invalid email or password.')
         );
@@ -131,50 +137,38 @@ app.post('/login', (req, res) => {
 
 //post request signup
 app.post('/signup', (req, res) => {
-  if (!req.body.name || !req.body.email || !req.body.password) {
+  //all fields are required
+  if (!req.body.username || !req.body.email || !req.body.password) {
     res.redirect('/signup?error=no-empty-fields');
   } else {
+    //populate the user table
     User.create({
-      name: req.body.name,
+      username: req.body.username,
       email: req.body.email,
       password: req.body.password,
     })
       .then(user => {
         req.session.user = user;
-        res.redirect('/profile');
+        res.redirect(`/blog/:${user.username}`);
       })
       .catch(err => {
         console.log(err);
       });
   }
 });
-//render the profile
-app.get('/profile', (req, res) => {
-  const user = req.session.user;
-  return Post.findAll({
-    include: [
-      {
-        model: User,
-        where: { name: user.name },
-      },
-    ],
-  }).then(posts => {
-    res.render('profile', { userInfo: user, posts });
-  });
+
+app.get('/create-post', (req, res) => {
+  res.render('create_post');
 });
 
-app.get('/new-post', (req, res) => {
-  res.render('new_post');
-});
-
-app.post('/new-post', (req, res) => {
-  const user = req.session.user.name;
+app.post('/create-post', (req, res) => {
+  const username = req.session.user.username;
   const title = req.body.title;
   const postBody = req.body.newPostBody;
 
   User.findOne({
     where: {
-      name: user,
+      username: username,
     },
   })
     .then(user => {
@@ -184,15 +178,18 @@ app.post('/new-post', (req, res) => {
       });
     })
     .then(post => {
-      //console.log(post);
-      res.redirect(`/all-posts/${post.id}`);
+      console.log(post);
+      res.redirect(`/blog/${username}/${post.id}`);
     })
     .catch(err => {
       console.log(err);
     });
 });
 
-app.get('/all-posts', (req, res) => {
+//get all blogposts from all users
+
+app.get('/blog', (req, res) => {
+  const user = req.session.user;
   Post.findAll({
     include: [
       {
@@ -200,12 +197,53 @@ app.get('/all-posts', (req, res) => {
       },
     ],
   }).then(post => {
-    res.render('all_posts', { postData: post });
+    res.render('all_posts', { postData: post, user });
   });
 });
 
-app.get('/all-posts/:postId', (req, res) => {
+//render the blog from specific user
+app.get('/blog/:username', (req, res) => {
+  const user = req.session.user;
+  const username = req.params.username;
+
+  return Post.findAll({
+    include: [
+      {
+        model: User,
+        where: { username: username },
+      },
+    ],
+  }).then(posts => {
+    let postTitle = '';
+    let postBody = '';
+    let postDate = '';
+    let postAuthor = '';
+    // console.log(posts);
+    // console.log(`this is the user from the session------${user.username}`);
+    posts.forEach(p => {
+      postTitle = p.title;
+      postBody = p.body;
+      postDate = p.createdAt;
+      postAuthor = p.user.username;
+      console.log(typeof p);
+    });
+    console.log(typeof posts);
+    res.render('blog', {
+      userInfo: user,
+      posts,
+      postTitle,
+      postBody,
+      postDate,
+      postAuthor,
+    });
+  });
+});
+
+app.get('/blog/:username/:postId', (req, res) => {
+  const user = req.session.user;
   const postId = req.params.postId;
+  const username = req.params.username;
+
   Post.findOne({
     where: {
       id: postId,
@@ -213,6 +251,7 @@ app.get('/all-posts/:postId', (req, res) => {
     include: [
       {
         model: User,
+        where: { username: username },
       },
     ],
   }).then(post => {

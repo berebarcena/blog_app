@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+
+</head>
+
+<body>
+  <% if (userInfo.username === postAuthor ) { %>
+  <nav>
+    <ul>
+      <li><a href="/logout">logout</a></li>
+    </ul>
+  </nav>
+  <h1>Welcome
+    <%= postAuthor %> to your Blog</h1>
+  <h2>Here are all your posts</h2>
+  <% posts.forEach(post =>{ %>
+  <a href="<%= post.id %>">
+    <div>
+      <%= post.title%>
+      <%= post.body %>
+      <%= post.createdAt %>
+    </div>
+  </a>
+  <% }) %>
+  <% } else { %>
+  <h1>Welcome
+    to
+    <%= postAuthor %>'s Blog</h1>
+
+  <h2>Here are the posts</h2>
+  <% posts.forEach(post =>{ %>
+  <a href="<%= post.id %>">
+    <div>
+      <%= post.title%>
+      <%= post.body %>
+      <%= post.createdAt %>
+    </div>
+  </a>
+  <% }) %>
+  <% } %>
+</body>
+
+</html>
