@@ -8,7 +8,17 @@
 </head>
 
 <body>
-  <% if (userInfo.username === postAuthor ) { %>
+  <%  if (!posts.length ) { %>
+  <nav>
+    <ul>
+      <li><a href="/logout">logout</a></li>
+    </ul>
+  </nav>
+  <h1>Welcome
+    <%= userInfo.username %> to your Blog</h1>
+  <p>you have no posts yet </p>
+
+  <% } else if (userInfo.username === postAuthor ) { %>
   <nav>
     <ul>
       <li><a href="/logout">logout</a></li>
