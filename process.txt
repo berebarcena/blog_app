@@ -1,0 +1,49 @@
+Relationships:
+
+1 user can have many posts
+1 post can have many comments
+1 user can have many comments
+1 comment belongs to 1 post and 1 user
+1 post belongs to only 1 user
+
+I will need 3 tables:
+Users:
+id, username, email and password
+Posts:
+id, title, body, and userId(foreign key)
+Comments
+id, comment, postId(fk), userId(fk) and to make things easier also the name of the commentAuthor.
+
+Routes
+Login
+This will be home (only if logged out, because once logged in the home should be each user blog)
+If user exists, then Find it and redirect me to the user's blog, if user does not exist, then throw an error.
+
+Signup
+Grab the data from the form(post req) and store it in the data base, then, redirect to the user's blog.
+
+Create Post
+Grab the data from the form (post req)...from the session, grab the username and then, from the User table, fetch that user that has the same username as the session. Then, create the post. (that will assign the post to that specific user)
+
+blog
+This will be where all the posts from all users are listed, so I'll use a Post.findAll to get them.
+
+Blog/:username
+This will list all post from 1 user.
+I'll use req.params to retrieve the requested :username, that way we can compare it with the Post.findAll including the User model.
+
+Blog/:username/:postid
+Will render a specific post that belongs to that user. (See line 236 of app.js for further explanation)
+
+New-comment
+Grab the data from the form(post req) and store it in the data base
+
+Logout
+Destroy the session.
+
+My personal logic
+Only logged in users can:
+a)create a new post
+b) post a comment in a post
+
+:)
