@@ -7,6 +7,20 @@
 </head>
 
 <body>
+  <%  if (username) { %>
+  <nav>
+    <ul>
+      <li><a href="/logout">logout</a></li>
+      <li><a href="/blog">See all posts</a></li>
+    </ul>
+  </nav>
+  <% } else { %>
+  <nav>
+    <ul>
+      <li><a href="/blog">See all posts</a></li>
+    </ul>
+  </nav>
+  <% }  %>
 
   <h1>Create a new post </h1>
 

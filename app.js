@@ -168,7 +168,8 @@ app.post('/signup', (req, res) => {
 
 //render the create post form
 app.get('/create-post', (req, res) => {
-  res.render('create_post');
+  const username = req.session.user.username;
+  res.render('create_post', { username });
 });
 
 //create a new blog post

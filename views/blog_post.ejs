@@ -8,21 +8,39 @@
 </head>
 
 <body>
+  <%  if (user && user.username) { %>
+  <nav>
+    <ul>
+      <li><a href="/logout">logout</a></li>
+      <li><a href="/blog">See all posts</a></li>
+    </ul>
+  </nav>
+  <% } else { %>
+  <nav>
+    <ul>
+      <li><a href="/blog">See all posts</a></li>
+    </ul>
+  </nav>
+  <% } %>
+
   <% if (!post ) { %>
   <h1>No post with that Id</h1>
   <% } else { %>
-  <h1>
-    <%= post.title%>
-  </h1>
-  <div>Published on
-    <%= post.createdAt %>
+  <div class="postWrapper">
+    <h1>
+      <%= post.title%>
+    </h1>
+    <div class="postBody">
+      <%= post.body %>
+    </div>
+    <p>Published on
+      <%= post.createdAt %>
+    </p>
+    <p>| Written by <a href="/blog/<%=post.user.username%>">
+        <%= post.user.username %></a>
+    </p>
   </div>
-  <div>
-    <%= post.body %>
-  </div>
-  <div>Written by <a href="/blog/<%=post.user.username%>">
-      <%= post.user.username %></a>
-  </div>
+
   <% if (post.comments && post.comments.length ) { %>
   <h3>Comments for this post</h3>
   <% post.comments.forEach(c =>{ %>
