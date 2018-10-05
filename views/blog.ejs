@@ -13,8 +13,10 @@
   <nav>
     <ul>
       <li><a href="/logout">logout</a></li>
+      <li><a href="/blog/<%=userInfo.username%>">Your Blog</a></li>
       <li><a href="/blog">See all posts</a></li>
       <li><a href='/create-post'>Create a new post</a></li>
+
     </ul>
   </nav>
   <% } else { %>
@@ -44,6 +46,7 @@
         <%= post.title%>
       </h3>
       <p>
+        Written on
         <%= post.createdAt %>
       </p>
     </a>
