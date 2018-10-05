@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
   <% if (!post ) { %>
   <h1>No post with that Id</h1>
   <% } else { %>
@@ -27,8 +26,11 @@
   <% if (post.comments && post.comments.length ) { %>
   <h3>Comments for this post</h3>
   <% post.comments.forEach(c =>{ %>
-  <p>
+  <div>
     <%= c.comment %>
+  </div>
+  <p>Comment by
+    <%= c.commentAuthor %>
   </p>
   <% }) %>
   <% } else { %>
@@ -37,7 +39,6 @@
   <% if (user ) { %>
   <h2>Leave a comment</h2>
   <form method="POST" action="/new-comment" id="commentForm">
-
     <textarea type="text" placeholder="Your nice comment here" name="comment" form="commentForm" autocomplete="off"></textarea>
     <input type="hidden" name="postId" value="<%= post.id %>" />
     <input type="hidden" name="postAuthor" value="<%= post.user.username %>" />

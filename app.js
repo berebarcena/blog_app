@@ -75,6 +75,9 @@ const Comment = sequelize.define('comments', {
   comment: {
     type: Sequelize.TEXT,
   },
+  commentAuthor: {
+    type: Sequelize.TEXT,
+  },
   createdAt: Sequelize.DATEONLY,
   updatedAt: Sequelize.DATEONLY,
 });
@@ -85,6 +88,7 @@ Post.belongsTo(User);
 Post.hasMany(Comment);
 Comment.belongsTo(Post);
 User.hasMany(Comment);
+Comment.belongsTo(User);
 
 //login is the home (if logged out)
 app.get('/', (req, res) => {
@@ -280,12 +284,14 @@ app.get('/blog/:username/:postId', (req, res) => {
 app.post('/new-comment', (req, res) => {
   const comment = req.body.comment;
   const userId = req.session.user.id;
+  const username = req.session.user.username;
   //hidden inputs to create the redirect path
   const postId = req.body.postId;
   const postAuthor = req.body.postAuthor;
 
   return Comment.create({
     comment,
+    commentAuthor: username,
     postId,
     userId,
   })
