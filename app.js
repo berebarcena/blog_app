@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const Sequelize = require('sequelize');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const bcrypt = require('bcrypt');
 
 //get the css files
 app.use(express.static('public'));
@@ -129,14 +130,21 @@ app.post('/login', (req, res) => {
     },
   })
     .then(user => {
-      if (user && password === user.password) {
-        req.session.user = user;
-        res.redirect(`/blog/${user.username}`);
+      if (user) {
+        bcrypt.compare(password, user.password).then(isValidPassword => {
+          if (isValidPassword) {
+            req.session.user = user;
+            res.redirect(`/blog/${user.username}`);
+          } else {
+            //if the password is incorrect, send a message
+            res.redirect(
+              '/?message=' + encodeURIComponent('Invalid  password.')
+            );
+          }
+        });
       } else {
-        //if the password or email is incorrect, send a message
-        res.redirect(
-          '/?message=' + encodeURIComponent('Invalid email or password.')
-        );
+        //if user does not exist, send a message
+        res.redirect('/?message=' + encodeURIComponent('User does not exist'));
       }
     })
     .catch(error => {
@@ -150,12 +158,17 @@ app.post('/signup', (req, res) => {
   if (!req.body.username || !req.body.email || !req.body.password) {
     res.redirect('/signup?error=no-empty-fields');
   } else {
-    //populate the user table
-    User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-    })
+    const password = req.body.password;
+    bcrypt
+      .hash(password, 8)
+      .then(hash => {
+        return User.create({
+          //populate the user table
+          username: req.body.username,
+          email: req.body.email,
+          password: hash,
+        });
+      })
       .then(user => {
         req.session.user = user;
         res.redirect(`/blog/${user.username}`);
@@ -233,7 +246,7 @@ app.get('/blog/:username', (req, res) => {
   });
 });
 
-//render specific post
+//render specific post from each user
 app.get('/blog/:username/:postId', (req, res) => {
   const user = req.session.user;
   const postId = req.params.postId;
