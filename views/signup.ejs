@@ -9,11 +9,20 @@
 <body>
 
   <h1>Sign up </h1>
-  <p>Enter your details below, all fields are required .</p>
+  <p>Enter your details below, all fields are required. <br>Password must include uppercase, lowercase, number/special
+    char
+    and minimum 8 chars</p>
   <form method="POST" action="/signup">
-    <input type="text" placeholder="Your username" name="username" autocomplete="off">
-    <input type="text" placeholder="Your email" name="email" autocomplete="off">
-    <input type="password" placeholder="Your password" name="password" autocomplete="off">
+
+    <input type="text" placeholder="Your username" name="username" autocomplete="off" required>
+
+    <input type="email" placeholder="Your email" name="email" autocomplete="off" required>
+    <!--The pattern checks for uppercase, lowercase, number/special char and minimum 8 chars-->
+    <input type="password" id="pass1" placeholder="Your password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+      name="password" autocomplete="off" required oninvalid="this.setCustomValidity('Your password must include uppercase, lowercase, number/special char and minimum 8 chars')"
+      oninput="this.setCustomValidity('')">
+    <input type="password" id="pass2" placeholder="Confirm Password" name="confirmPassword" autocomplete="off" required>
+    <p id="passMsg"></p>
     <h3 class="red">
       <%= error %>
     </h3>
@@ -25,5 +34,24 @@
   </div>
 
 </body>
+<!--validate if passwords match on the client side-->
+<script>
+
+  function checkPass() {
+    const pass1 = document.getElementById('pass1');
+    const pass2 = document.getElementById('pass2');
+    const message = document.getElementById('passMsg');
+    if (pass1.value !== pass2.value) {
+      message.style.color = 'red';
+      message.innerHTML = "Passwords Do Not Match!"
+    } else {
+      message.style.color = 'green';
+      message.innerHTML = "Passwords Match!"
+    }
+  }
+  let el = document.getElementById('pass2');
+  el.addEventListener('keyup', checkPass, false);
+
+</script>
 
 </html>

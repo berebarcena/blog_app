@@ -93,19 +93,18 @@ Comment.belongsTo(User);
 
 //login is the home (if logged out)
 app.get('/', (req, res) => {
+  const message = req.query.message;
   if (req.session.user) {
     res.redirect(`/blog/${req.session.user.username}`);
   } else {
-    res.render('login', { message: req.query.message });
+    res.render('login', { message });
   }
 });
 
 //signup route
 app.get('/signup', (req, res) => {
   const error = req.query.error;
-  const errorMsg =
-    error === 'no-empty-fields' ? 'Sorry! but all the fields are required' : '';
-  res.render('signup', { error: errorMsg });
+  res.render('signup', { error });
 });
 
 //post request login
@@ -156,27 +155,51 @@ app.post('/login', (req, res) => {
 app.post('/signup', (req, res) => {
   //all fields are required
   if (!req.body.username || !req.body.email || !req.body.password) {
-    res.redirect('/signup?error=no-empty-fields');
-  } else {
-    const password = req.body.password;
-    bcrypt
-      .hash(password, 8)
-      .then(hash => {
-        return User.create({
-          //populate the user table
-          username: req.body.username,
-          email: req.body.email,
-          password: hash,
-        });
-      })
-      .then(user => {
-        req.session.user = user;
-        res.redirect(`/blog/${user.username}`);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    res.redirect(
+      '/signup?error=' + encodeURIComponent('All fields are required')
+    );
   }
+  //validates that passwords match
+  if (req.body.password !== req.body.confirmPassword) {
+    res.redirect('/signup?error=' + encodeURIComponent('Passwords must match'));
+  }
+  //find a user with that username
+  User.findOne({
+    where: {
+      username: req.body.username,
+    },
+  })
+    .then(user => {
+      //if username is already taken, then send an error
+      if (user) {
+        return res.redirect(
+          '/signup?error=' + encodeURIComponent('Username already taken')
+        );
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+  const password = req.body.password;
+  bcrypt
+    .hash(password, 8)
+    .then(hash => {
+      return User.create({
+        //populate the user table using an encrypted password
+        username: req.body.username,
+        email: req.body.email,
+        password: hash,
+      });
+    })
+    .then(user => {
+      req.session.user = user;
+      //and redirect the newly created user to his/her blog
+      res.redirect(`/blog/${user.username}`);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
 
 //render the create post form
